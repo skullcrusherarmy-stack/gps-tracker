@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GPS Data Table</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      margin: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #333;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>GPS Data Table</h2>
+
+<a href="/">← Back to Map</a>
+
+<table id="gpsTable">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>Time</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+async function loadData() {
+  const res = await fetch('/gps');
+  const data = await res.json();
+
+  const tbody = document.querySelector("#gpsTable tbody");
+  tbody.innerHTML = "";
+
+  data.forEach((point, index) => {
+    const row = `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${point.lat}</td>
+        <td>${point.lng}</td>
+        <td>${new Date(point.time).toLocaleString()}</td>
+      </tr>
+    `;
+    tbody.innerHTML += row;
+  });
+}
+
+// refresh every 3 sec
+setInterval(loadData, 3000);
+</script>
+
+</body>
+</html>

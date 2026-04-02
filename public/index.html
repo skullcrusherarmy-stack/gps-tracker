@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GPS Tracker</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <style>
+    body { margin: 0; }
+    #map { height: 100vh; }
+  </style>
+</head>
+
+<body>
+    <a href="/table.html" style="position:absolute;z-index:1000;background:white;padding:10px;">
+  View Table 📊
+</a>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+const map = L.map('map').setView([20, 77], 5);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+.addTo(map);
+
+let markers = [];
+
+async function loadGPS() {
+  try {
+    const res = await fetch('/gps');
+    const data = await res.json();
+
+    // Remove old markers
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    data.forEach(point => {
+      const marker = L.marker([point.lat, point.lng]).addTo(map);
+      markers.push(marker);
+    });
+
+    if (data.length > 0) {
+      const last = data[data.length - 1];
+      map.setView([last.lat, last.lng], 15);
+    }
+
+  } catch (err) {
+    console.error("Error:", err);
+  }
+}
+
+// Refresh every 3 seconds
+setInterval(loadGPS, 3000);
+</script>
+
+</body>
+</html>
